@@ -4,13 +4,10 @@
   "description": "A library of prompt optimizers.",
   "type": "module",
   "exports": {
-    "types": "./dist/*.d.ts",
-    "default": "./dist/*.js"
+    "types": "./dist/index.d.ts",
+    "default": "./dist/index.js"
   },
-  "keywords": [
-    "ai",
-    "llm"
-  ],
+  "keywords": ["ai", "llm"],
   "author": "Travis Ennis",
   "license": "MIT",
   "scripts": {
