@@ -36,7 +36,9 @@ class AdvancedSelfConsistency {
     // You might want to use a proper string similarity library
     const longer = a.length > b.length ? a : b;
     const shorter = a.length > b.length ? b : a;
-    if (longer.length === 0) return 1.0;
+    if (longer.length === 0) {
+      return 1.0;
+    }
     return (longer.length - this.editDistance(longer, shorter)) / longer.length;
   }
 
@@ -56,7 +58,9 @@ class AdvancedSelfConsistency {
           lastValue = newValue;
         }
       }
-      if (i > 0) costs[s2.length] = lastValue;
+      if (i > 0) {
+        costs[s2.length] = lastValue;
+      }
     }
     return costs[s2.length];
   }

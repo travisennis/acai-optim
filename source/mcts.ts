@@ -9,7 +9,7 @@ interface EvaluationMetrics {
 
 // Immutable state representation for better tree search
 class DialogueState {
-  readonly conversationHistory: ReadonlyArray<CoreMessage>;
+  readonly conversationHistory: readonly CoreMessage[];
   readonly systemPrompt: string;
   readonly currentQuery: string;
   readonly depth: number;
@@ -17,7 +17,7 @@ class DialogueState {
 
   private constructor(
     systemPrompt: string,
-    conversationHistory: ReadonlyArray<CoreMessage>,
+    conversationHistory: readonly CoreMessage[],
     currentQuery: string,
     depth = 0,
     metrics?: EvaluationMetrics,
@@ -73,12 +73,12 @@ class DialogueState {
   }
 }
 
-class MCTSNode {
+class MctsNode {
   readonly id: string;
   readonly state: DialogueState;
-  readonly parent: MCTSNode | null;
+  readonly parent: MctsNode | null;
   readonly action: string | null;
-  readonly children: MCTSNode[];
+  readonly children: MctsNode[];
   visits: number;
   isFullyExpanded: boolean;
   private totalValue: number;
@@ -87,7 +87,7 @@ class MCTSNode {
 
   constructor(
     state: DialogueState,
-    parent: MCTSNode | null = null,
+    parent: MctsNode | null = null,
     action: string | null = null,
     visits = 0,
     totalValue = 0,
@@ -150,8 +150,8 @@ class MCTSNode {
   }
 }
 
-class MCTS {
-  private readonly transpositionTable: Map<string, MCTSNode>;
+class Mcts {
+  private readonly transpositionTable: Map<string, MctsNode>;
   private readonly actionPriors: Map<string, number>;
   private readonly model: LanguageModel;
   private readonly simulationDepth: number;
@@ -186,12 +186,12 @@ class MCTS {
     this.actionPriors = new Map();
   }
   async findBestResponse(initialState: DialogueState): Promise<string> {
-    const root = new MCTSNode(initialState);
+    const root = new MctsNode(initialState);
     this.transpositionTable.set(root.state.hash(), root);
 
     const inProgress = new Set<string>();
 
-    const simulationPromises = Array(this.numSimulations)
+    const simulationPromises = new Array(this.numSimulations)
       .fill(null)
       .map(async () => {
         const path = await this.select(root, inProgress);
@@ -207,7 +207,9 @@ class MCTS {
     await Promise.all(simulationPromises);
 
     // Select the child with the most visits
-    if (root.children.length === 0) return "";
+    if (root.children.length === 0) {
+      return "";
+    }
 
     const bestChild = root.children.reduce((best, child) =>
       child.getVisits() > best.getVisits() ? child : best,
@@ -217,16 +219,18 @@ class MCTS {
   }
 
   private async select(
-    node: MCTSNode,
+    node: MctsNode,
     inProgress: Set<string>,
-  ): Promise<MCTSNode[]> {
-    const path: MCTSNode[] = [];
+  ): Promise<MctsNode[]> {
+    const path: MctsNode[] = [];
     let current = node;
 
     while (!this.isTerminal(current.state) && current.isFullyExpanded) {
       path.push(current);
 
-      if (current.children.length === 0) break;
+      if (current.children.length === 0) {
+        break;
+      }
 
       // Apply virtual loss
       const nodeHash = current.state.hash();
@@ -256,8 +260,10 @@ class MCTS {
     return path;
   }
 
-  private async expand(node: MCTSNode): Promise<MCTSNode> {
-    if (this.isTerminal(node.state)) return node;
+  private async expand(node: MctsNode): Promise<MctsNode> {
+    if (this.isTerminal(node.state)) {
+      return node;
+    }
 
     const actions = await this.generateActions(node.state);
     if (actions.length === 0) {
@@ -277,7 +283,7 @@ class MCTS {
       let childNode = this.transpositionTable.get(stateHash);
 
       if (!childNode) {
-        childNode = new MCTSNode(newState, node, action);
+        childNode = new MctsNode(newState, node, action);
         this.transpositionTable.set(stateHash, childNode);
       }
 
@@ -289,14 +295,16 @@ class MCTS {
     return node.children[0];
   }
 
-  private async simulate(node: MCTSNode): Promise<number> {
+  private async simulate(node: MctsNode): Promise<number> {
     let currentState = node.state;
     let depth = 0;
     let value = 0;
 
     while (!this.isTerminal(currentState) && depth < this.simulationDepth) {
       const actions = await this.generateActions(currentState);
-      if (actions.length === 0) break;
+      if (actions.length === 0) {
+        break;
+      }
 
       // Progressive widening
       const numActions = Math.max(1, Math.floor(Math.sqrt(depth + 1)));
@@ -317,7 +325,7 @@ class MCTS {
     return value / (depth || 1);
   }
 
-  private backpropagate(path: MCTSNode[], value: number): void {
+  private backpropagate(path: MctsNode[], value: number): void {
     for (const node of path.reverse()) {
       node.addVisit(value);
 
@@ -441,7 +449,7 @@ class MCTS {
       return expScores.map((score) => score / sum);
     } catch (_error) {
       // Uniform distribution as fallback
-      return Array(actions.length).fill(1 / actions.length);
+      return new Array(actions.length).fill(1 / actions.length);
     }
   }
 }
@@ -475,7 +483,7 @@ export async function mcts({
     useRAVE: options.useRAVE ?? true,
   };
 
-  const mctsInstance = new MCTS(
+  const mctsInstance = new Mcts(
     model,
     simulationDepth,
     numSimulations,

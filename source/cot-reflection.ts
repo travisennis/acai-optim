@@ -13,7 +13,7 @@ class CoTReflection {
     const cotPrompt = `
           ${this.systemPrompt}
 
-          You are an AI assistant that uses a Chain of Thought (CoT) approach with reflection to answer queries. Follow these steps:
+          ${this.systemPrompt ? "You are an AI assistant that uses" : "In addition, you use"} a Chain of Thought (CoT) approach with reflection to answer queries. Follow these steps:
 
           1. Think through the problem step by step within the <thinking> tags.
           2. Reflect on your thinking to check for any errors or improvements within the <reflection> tags.

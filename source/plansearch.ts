@@ -14,7 +14,9 @@ function formatPlanSearchResult(result: PlanSearchResult): string {
     observations: string[],
     title: string,
   ): string => {
-    if (!observations.length) return "";
+    if (observations.length === 0) {
+      return "";
+    }
     return `${title}:\n${observations.map((obs) => `  • ${obs}`).join("\n")}\n`;
   };
 
@@ -216,10 +218,10 @@ Generate a concrete implementation of the solution above. The implementation sho
     numInitialObservations = 3,
     numDerivedObservations = 2,
   ): Promise<{
-    attempts: Array<PlanSearchResult>;
+    attempts: PlanSearchResult[];
     tokens: number;
   }> {
-    const attempts: Array<PlanSearchResult> = [];
+    const attempts: PlanSearchResult[] = [];
     let totalTokens = 0;
 
     for (let i = 0; i < n; i++) {
