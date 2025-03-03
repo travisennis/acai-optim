@@ -7,10 +7,7 @@
     "types": "./dist/index.d.ts",
     "default": "./dist/index.js"
   },
-  "keywords": [
-    "ai",
-    "llm"
-  ],
+  "keywords": ["ai", "llm"],
   "author": "Travis Ennis",
   "license": "MIT",
   "scripts": {
@@ -29,14 +26,14 @@
     "check": "npx npm-check-updates  --interactive --format group"
   },
   "dependencies": {
-    "@travisennis/acai-core": "^0.0.24",
-    "ai": "^4.1.41",
+    "@travisennis/acai-core": "^0.0.44",
+    "ai": "^4.1.47",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@types/node": "^22.13.4",
-    "typescript": "^5.7.3"
+    "@types/node": "^22.13.8",
+    "typescript": "^5.8.2"
   },
   "publishConfig": {
     "access": "public"
