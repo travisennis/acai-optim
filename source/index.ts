@@ -9,6 +9,6 @@ export { moa } from "./moa.ts";
 export { plansearch } from "./plansearch.ts";
 export { pvg } from "./pvg.ts";
 export { reread } from "./reread.ts";
-export { rto } from "./rto.ts";
+export { roundTripOptimization } from "./rto.ts";
 export { selfConsistency } from "./self-consistency.ts";
 export { tot } from "./tot.ts";
